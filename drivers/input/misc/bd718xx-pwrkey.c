@@ -126,7 +126,10 @@ static int bd718xx_pwr_btn_probe(struct platform_device *pdev)
 
 	err = platform_get_irq_byname(pdev, "pwr-btn-s");
 	if (err<0)
+	{
+		pr_err("Vituiks meni %d\n",err);
 		goto err_out;
+	}
 
 	pk->irq = err;
 	err = devm_request_threaded_irq(&pdev->dev, pk->irq, NULL, &button_irq,
@@ -147,7 +150,7 @@ static int bd718xx_pwr_btn_probe(struct platform_device *pdev)
 	if(pdev->dev.of_node)
 		pr_info("node name :%s\n",(pdev->dev.of_node->name)?pdev->dev.of_node->name:"unknown");
 
-	if (of_device_is_system_power_controller(pdev->dev.of_node))
+	if (of_device_is_system_power_controller(pdev->dev.parent->of_node))
 		set_power_off(pk);
 
 err_out:
@@ -156,11 +159,13 @@ err_out:
 }
 
 #ifdef CONFIG_OF
+/*
 static const struct of_device_id bd718xx_pwr_key_match[] = {
 	{ .compatible = "rohm,bd718xx-pwrkey" },
 	{},
 };
 MODULE_DEVICE_TABLE(of, bd718xx_pwr_key_match);
+*/
 #endif
 
 
@@ -169,7 +174,7 @@ static struct platform_driver bd718xx_pwr_btn_driver = {
 	.remove = bd718xx_pwr_btn_remove,
 	.driver = {
 		.name	= "bd718xx-pwrkey",
-		.of_match_table = of_match_ptr(bd718xx_pwr_key_match),
+//		.of_match_table = of_match_ptr(bd718xx_pwr_key_match),
 	},
 };
 module_platform_driver(bd718xx_pwr_btn_driver);
