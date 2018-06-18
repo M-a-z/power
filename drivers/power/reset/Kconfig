@@ -46,6 +46,17 @@ config POWER_RESET_AXXIA
 
 	  Say Y if you have an Axxia family SoC.
 
+config POWER_RESET_BD718XX
+	bool "ROHM BD718xx PMIC reset driver"
+	depends on MFD_BD71837
+	help
+	  This driver supports resetting a system through ROHM
+	  BD718XX xx series PMICs. The BD718XX series PMICs include the
+	  BD71837 and BD71847 chips.
+
+	  Say Y if you have a board powered by BD718x7 PMIC and you wish
+	  to have the reset supported via the PMIC.
+
 config POWER_RESET_BRCMKONA
 	bool "Broadcom Kona reset driver"
 	depends on ARM || COMPILE_TEST
