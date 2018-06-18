@@ -47,6 +47,8 @@ static struct mfd_cell bd71837_mfd_cells[] = {
 		.pdata_size = sizeof(bd718xx_powerkey_data),
 	}, {
 		.name = "bd71837-pmic",
+	}, {
+		.name = "bd718xx-reset",
 	},
 };
 
