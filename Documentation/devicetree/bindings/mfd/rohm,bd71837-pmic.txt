@@ -22,6 +22,12 @@ Required properties:
 
 Optional properties:
 - clock-output-names	: Should contain name for output clock.
+- rohm,warm-reset	: Issue warm reset of PMIC instead of cold reset.
+- rohm,reset-delay	: Delay to keep powers out when reset is issued. Given
+			  as milliseconds. Applicable only for cold reset.
+			  Supported delay values are 5, 10, 15, 20, 25, 30, 35,
+			  40, 45, 50, 75, 100, 250, 500, 750 and 1500. HW
+			  default is used if value is not given.
 
 Example:
 
