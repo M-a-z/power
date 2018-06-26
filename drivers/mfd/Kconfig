@@ -1788,7 +1788,7 @@ config MFD_STW481X
 	  Nomadik series.
 
 config MFD_BD71837
-	bool "BD71837 Power Management chip"
+	tristate "BD71837 Power Management chip"
 	depends on I2C=y
 	depends on OF
 	select REGMAP_I2C
