@@ -226,7 +226,6 @@ MODULE_DEVICE_TABLE(i2c, bd71837_i2c_id);
 static struct i2c_driver bd71837_i2c_driver = {
 	.driver = {
 		.name = "bd71837-mfd",
-		.owner = THIS_MODULE,
 		.of_match_table = of_match_ptr(bd71837_of_match),
 	},
 	.probe = bd71837_i2c_probe,
