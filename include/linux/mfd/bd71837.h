@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
 /* Copyright (C) 2018 ROHM Semiconductors */
 
 /*
@@ -219,10 +219,10 @@ enum {
 /* BD71837_REG_LDO7_VOLT bits */
 #define LDO7_MASK		0x0F
 
-/* register write induced reset settings */
+/* Register write induced reset settings */
 
-/* even though the bit zero is not SWRESET type we still want to write zero
- * to it when changing type. Biz zero is 'SWRESET' trigger bit and if we
+/* Even though the bit zero is not SWRESET type we still want to write zero
+ * to it when changing type. Bit zero is 'SWRESET' trigger bit and if we
  * write 1 to it we will trigger the action. So always write 0 to it when
  * changning SWRESET action - no matter what we read from it.
  */
