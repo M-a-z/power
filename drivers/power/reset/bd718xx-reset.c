@@ -46,6 +46,13 @@ static int bd718xx_reset_call(struct notifier_block *rhandle,
 		}
 	};
 
+	pr_crit("DFHKASJHDFJKASHDFJKLHSKDFHAJKLSDFHKLASHLDFKHAS\n");
+	pr_crit("DFHKASJHDFJKASHDFJKLHSKDFHAJKLSDFHKLASHLDFKHAS\n");
+	pr_crit("DFHKASJHDFJKASHDFJKLHSKDFHAJKLSDFHKLASHLDFKHAS\n");
+	pr_crit("DFHKASJHDFJKASHDFJKLHSKDFHAJKLSDFHKLASHLDFKHAS\n");
+	pr_crit("DFHKASJHDFJKASHDFJKLHSK****DFHAJKLSDFHKLASHLDFKHAS\n");
+	pr_crit("DFHKASJHDFJKASHDFJKLHSKD****FHAJKLSDFHKLASHLDFKHAS\n");
+
 	for (i=0; i<ARRAY_SIZE(reset_seq); i++)
 		regmap_update_bits(r->mfd->regmap, reset_seq[i].reg,
 				   reset_seq[i].mask, reset_seq[i].val);
@@ -109,6 +116,8 @@ static int set_delay(struct bd718xx_reset *r, unsigned int delay)
 	return rval;
 }
 
+extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
+
 static int bd718xx_reset_probe(struct platform_device *pdev)
 {
 	unsigned int delay = 0;
@@ -125,6 +134,8 @@ static int bd718xx_reset_probe(struct platform_device *pdev)
 	r->reset_handler.priority = 129;
 	r->reset_type = BD71837_SWRESET_TYPE_COLD;
 	platform_set_drvdata(pdev, r);
+
+	arm_pm_restart = NULL;
 
 	rval = of_property_read_u32(pdev->dev.parent->of_node, "rohm,reset-delay",
 				    &delay);
