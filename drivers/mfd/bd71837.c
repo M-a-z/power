@@ -1,33 +1,25 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2018 ROHM Semiconductors
 // bd71837.c -- ROHM BD71837MWV mfd driver
 //
 // Datasheet available from
 // https://www.rohm.com/datasheet/BD71837MWV/bd71837mwv-e
 
-#include <linux/module.h>
-#include <linux/moduleparam.h>
-#include <linux/init.h>
-#include <linux/slab.h>
 #include <linux/i2c.h>
-#include <linux/interrupt.h>
-#include <linux/irq.h>
-#include <linux/irqdomain.h>
-#include <linux/gpio.h>
-#include <linux/regmap.h>
-#include <linux/of_device.h>
-#include <linux/of_gpio.h>
-#include <linux/mfd/core.h>
-#include <linux/mfd/bd71837.h>
-#include <linux/gpio_keys.h>
 #include <linux/input.h>
+#include <linux/interrupt.h>
+#include <linux/mfd/bd71837.h>
+#include <linux/mfd/core.h>
+#include <linux/module.h>
+#include <linux/regmap.h>
+#include <linux/gpio_keys.h>
 
 static struct gpio_keys_button btns[] = {
 	{
 		.code = KEY_POWER,
 		.gpio = -1,
 		.type = EV_KEY,
-	},
+	}
 };
 
 static struct gpio_keys_platform_data bd718xx_powerkey_data = {
@@ -49,7 +41,7 @@ static struct mfd_cell bd71837_mfd_cells[] = {
 		.name = "bd71837-pmic",
 	}, {
 		.name = "bd718xx-reset",
-	},
+	}
 };
 
 static const struct regmap_irq bd71837_irqs[] = {
@@ -75,13 +67,6 @@ static struct regmap_irq_chip bd71837_irq_chip = {
 	.mask_invert = false,
 };
 
-static int bd71837_irq_exit(struct bd71837 *bd71837)
-{
-	if (bd71837->chip_irq > 0)
-		regmap_del_irq_chip(bd71837->chip_irq, bd71837->irq_data);
-	return 0;
-}
-
 static const struct regmap_range pmic_status_range = {
 	.range_min = BD71837_REG_IRQ,
 	.range_max = BD71837_REG_POW_STATE,
@@ -100,13 +85,11 @@ static const struct regmap_config bd71837_regmap_config = {
 	.cache_type = REGCACHE_RBTREE,
 };
 
-#ifdef CONFIG_OF
 static const struct of_device_id bd71837_of_match[] = {
-	{ .compatible = "rohm,bd71837", .data = (void *)0},
-	{ },
+	{ .compatible = "rohm,bd71837", },
+	{ }
 };
 MODULE_DEVICE_TABLE(of, bd71837_of_match);
-#endif //CONFIG_OF
 
 static int bd71837_i2c_probe(struct i2c_client *i2c,
 			    const struct i2c_device_id *id)
@@ -157,9 +140,9 @@ static int bd71837_i2c_probe(struct i2c_client *i2c,
 		goto err_out;
 	}
 
-	ret = regmap_add_irq_chip(bd71837->regmap, bd71837->chip_irq,
-		IRQF_ONESHOT, 0,
-		&bd71837_irq_chip, &bd71837->irq_data);
+	ret = devm_regmap_add_irq_chip(&i2c->dev, bd71837->regmap,
+				       bd71837->chip_irq, IRQF_ONESHOT, 0,
+				       &bd71837_irq_chip, &bd71837->irq_data);
 	if (ret < 0) {
 		dev_err(bd71837->dev, "Failed to add irq_chip %d\n", ret);
 		goto err_out;
@@ -177,7 +160,7 @@ static int bd71837_i2c_probe(struct i2c_client *i2c,
 		goto err_out;
 	}
 	/* According to BD71847 datasheet the HW default for long press detection
-	 * is 10ms. So letch change it to 10 sec so we can actually get the short
+	 * is 10ms. So lets change it to 10 sec so we can actually get the short
 	 * push and allow gracefull shut down
 	 */
 	ret = regmap_update_bits(bd71837->regmap,
@@ -196,25 +179,13 @@ static int bd71837_i2c_probe(struct i2c_client *i2c,
 		goto err_out;
 	}
 
-	ret = mfd_add_devices(bd71837->dev, PLATFORM_DEVID_AUTO,
-			      bd71837_mfd_cells, ARRAY_SIZE(bd71837_mfd_cells),
-			      NULL, 0,
-			      regmap_irq_get_domain(bd71837->irq_data));
-	if (ret)
-		regmap_del_irq_chip(bd71837->chip_irq, bd71837->irq_data);
+	ret = devm_mfd_add_devices(bd71837->dev, PLATFORM_DEVID_AUTO,
+				   bd71837_mfd_cells,
+				   ARRAY_SIZE(bd71837_mfd_cells), NULL, 0,
+				   regmap_irq_get_domain(bd71837->irq_data));
 err_out:
 
 	return ret;
-}
-
-static int bd71837_i2c_remove(struct i2c_client *i2c)
-{
-	struct bd71837 *bd71837 = i2c_get_clientdata(i2c);
-
-	bd71837_irq_exit(bd71837);
-	mfd_remove_devices(bd71837->dev);
-
-	return 0;
 }
 
 static const struct i2c_device_id bd71837_i2c_id[] = {
@@ -226,10 +197,9 @@ MODULE_DEVICE_TABLE(i2c, bd71837_i2c_id);
 static struct i2c_driver bd71837_i2c_driver = {
 	.driver = {
 		.name = "bd71837-mfd",
-		.of_match_table = of_match_ptr(bd71837_of_match),
+		.of_match_table = bd71837_of_match,
 	},
 	.probe = bd71837_i2c_probe,
-	.remove = bd71837_i2c_remove,
 	.id_table = bd71837_i2c_id,
 };
 
